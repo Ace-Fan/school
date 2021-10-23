@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.base.dao.BaseGroupTableDao">
+    <!-- 获取排序号 -->
+	<select id="selectMaxOrderNo" resultType="Integer">
+		select max(order_no) from ${tableName}
+	</select>
+	
+	<!-- 单个删除信息（逻辑删除） -->
+	<update id="deleteOne">
+		UPDATE ${tableName} SET del_flag = 1 WHERE id = #{id}
+	</update>
+	
+	<!-- 批量删除 -->
+	<update id="batchDelete">
+		UPDATE ${tableName} SET ${field} = 1 where id in
+		<foreach item="item" index="index" collection="id" open="(" separator="," close=")">
+      		#{item}
+		</foreach>
+	</update>
+	
+	<!-- 切换指定表指定主键指定字段的值 -->
+	<update id="toggleTableColumns">
+		update ${tableName} set ${colunms} = #{value}, update_by = ${currentUser}, update_date = #{uDate} where id = #{id}
+	</update>
+	
+	<!-- 获取最大值信息 -->
+	<!-- tableName 表名 -->
+	<!-- V19.08.05 by weekly -->
+	<select id="getMaxOrderNo" resultType="com.thinkgem.jeesite.modules.base.entity.BaseGroupTable">
+		select max(order_no) as "maxOrderNo" from ${tableName} where del_flag = 0
+	</select>
+	
+</mapper>

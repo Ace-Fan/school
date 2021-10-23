@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.wisdom.dao.base.WisAppVerDao">
+    
+	<!-- 通用查询字段SQL -->
+	<sql id="publicColumns">
+		a.id as "id",
+		a.is_enable as "isEnable",
+		a.create_by as "createBy",
+		a.create_date as "createDate",
+		a.update_by as "updateBy",
+		a.update_date as "updateDate",
+		a.order_no as "orderNo",
+		a.del_flag as "delFlag"
+	</sql>
+    
+	<!-- 新增通用字段SQL -->
+	<sql id="insertColumns">
+		is_enable,
+		order_no, 
+		del_flag,
+		create_by,
+		create_date
+	</sql>
+    
+    <!-- 新增通用关联字段SQL -->
+	<sql id="insertValue">
+		#{isEnable},
+		#{orderNo},
+		0,
+		#{createBy},
+		#{createDate}
+	</sql>
+	
+	<!-- 修改通用字段SQL -->
+    <sql id="updateColumns">
+		,is_enable = #{isEnable}
+		,update_by = #{updateBy}
+		,update_date = #{updateDate}
+    </sql>
+    
+    <!-- 通用查询SQL -->
+    <sql id="publicWhereSql">
+    	<where>
+			a.del_flag = 0
+			<if test="appName != null and appName != '' ">
+				and a.app_name like concat('%', #{appName}, '%')
+			</if>
+			<if test="appType != null and appType != ''">
+			 	and a.app_type like = #{appType}
+			</if>
+			<if test="appVer != null and appVer != '' ">
+				and a.app_ver like concat('%', #{appVer}, '%')
+			</if>
+			<if test="fileName != null and fileName != '' ">
+				and a.file_name like concat('%', #{fileName}, '%')
+			</if>
+			<if test="isEnable != null and isEnable != '' ">
+				and a.is_enable = #{isEnable}
+			</if>
+		</where>
+    </sql>
+    
+    <!-- 通用查询SQL -->
+	<sql id="publicSelect">
+		order by a.create_date desc
+		<if test="page!=null and limit!=null">
+			limit #{page}, #{limit}
+		</if>
+	</sql>
+    
+	<sql id="wisAppVerColumns">
+		a.app_name AS "appName",
+		a.app_type AS "appType",
+		a.app_ver AS "appVer",
+		a.app_desc AS "appDesc",
+		a.file_name AS "fileName",
+		a.file_url AS "fileUrl"
+	</sql>
+	
+	<sql id="wisAppVerJoins">
+	</sql>
+    
+    <!-- 获取最新版本的信息 -->
+	<select id="getNewVer" resultType="com.thinkgem.jeesite.modules.wisdom.entity.base.WisAppVer">
+		SELECT *, ABS(NOW() - create_date) AS DIFFTIME FROM wis_app_ver WHERE del_flag = 0 ORDER BY DIFFTIME ASC LIMIT 0, 1
+	</select>
+    
+	<select id="get" resultType="com.thinkgem.jeesite.modules.wisdom.entity.base.WisAppVer">
+		SELECT <include refid="wisAppVerColumns"/>,<include refid="publicColumns"/> FROM wis_app_ver a <include refid="wisAppVerJoins"/> WHERE a.id = #{id} and a.del_flag = 0
+	</select>
+	
+	<select id="getByBatchId" parameterType="java.util.List" resultType="com.thinkgem.jeesite.modules.wisdom.entity.base.WisAppVer">
+       	select <include refid="wisAppVerColumns" />,<include refid="publicColumns"/> from wis_app_ver a <include refid="wisAppVerJoins"/>
+       	where a.del_flag = 0 and a.id in
+       	<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+      		#{item}
+		</foreach>
+	</select>
+	
+	<select id="findList" resultType="com.thinkgem.jeesite.modules.wisdom.entity.base.WisAppVer">
+		select <include refid="wisAppVerColumns" />,<include refid="publicColumns"/> from wis_app_ver a <include refid="wisAppVerJoins" />
+		<include refid="publicWhereSql"/> <include refid="publicSelect"/>
+	</select>
+	
+	<select id="getCountPage" resultType="int" parameterType="com.thinkgem.jeesite.modules.wisdom.entity.base.WisAppVer">
+		select count(*) from wis_app_ver a <include refid="wisAppVerJoins" /> <include refid="publicWhereSql"/> 
+	</select>
+	
+	<select id="getAllList" resultType="com.thinkgem.jeesite.modules.wisdom.entity.base.WisAppVer">
+		select <include refid="wisAppVerColumns" />,<include refid="publicColumns"/> from wis_app_ver a <include refid="wisAppVerJoins"/> where a.del_flag = 0 order by a.order_no desc
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO wis_app_ver(
+			app_name,
+			app_type,
+			app_ver,
+			app_desc,
+			file_name,
+			file_url,
+			<include refid="insertColumns"/>
+		) VALUES (
+			#{appName},
+			#{appType},
+			#{appVer},
+			#{appDesc},
+			#{fileName},
+			#{fileUrl},
+			<include refid="insertValue"/>
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE wis_app_ver SET 	
+			del_flag = 0
+			,app_name = #{appName}
+			,app_type = #{appType}
+			,app_ver = #{appVer}
+			,app_desc = #{appDesc}
+			,file_name = #{fileName}
+			,file_url = #{fileUrl}
+			<include refid="updateColumns"/>
+		WHERE id = #{id}
+	</update>
+	
+	<!--批量导入-->
+	<insert id="insertLead" parameterType="java.util.List">
+		insert into wis_app_ver(app_name,app_type,app_ver,file_name,create_date) values
+ 		<foreach collection="list" item="item" index="index" separator=",">
+			(
+				#{item.appName},
+				#{item.appType},
+				#{item.appVer},
+				#{item.fileName},
+				SYSDATE()
+			)
+		</foreach>		
+	</insert>
+	
+</mapper>

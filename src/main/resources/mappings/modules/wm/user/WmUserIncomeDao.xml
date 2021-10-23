@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.wm.dao.user.WmUserIncomeDao">
+    
+	<sql id="publicColumns">
+		a.id as "id",
+		a.remark as "remark",
+		a.is_enable as "isEnable",
+		a.create_by as "createBy",
+		a.create_date as "createDate",
+		a.update_by as "updateBy",
+		a.update_date as "updateDate",
+		a.order_no as "orderNo",
+		a.del_flag as "delFlag"
+	</sql>
+	
+	<sql id="insertColumns">
+		remark,
+		is_enable,
+		order_no, 
+		del_flag,
+		create_by,
+		create_date
+	</sql>
+	
+	<sql id="insertValue">
+		#{remark},
+		#{isEnable},
+		#{orderNo},
+		0,
+		#{createBy},
+		#{createDate}
+	</sql>
+	
+    <sql id="updateColumns">
+    	,remark = #{remark}
+		,is_enable = #{isEnable}
+		,order_no = #{orderNo}
+		,update_by = #{updateBy}
+		,update_date = #{updateDate}
+    </sql>
+    
+    <sql id="publicWhereSql">
+    </sql>
+    
+	<sql id="publicSelect">
+	</sql>
+    
+	<sql id="wmUserIncomeColumns">
+		a.id AS "id",
+		a.user_id AS "user.id",
+		a.income_amount AS "incomeAmount",
+		a.income_type AS "incomeType",
+		a.remark AS "remark",
+		a.is_enable AS "isEnable",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.order_no AS "orderNo",
+		a.del_flag AS "delFlag",
+		u2.name AS "user.name"
+	</sql>
+	
+	<sql id="wmUserIncomeJoins">
+		LEFT JOIN sys_user u2 ON u2.id = a.user_id
+	</sql>
+    
+	<select id="get" resultType="com.thinkgem.jeesite.modules.wm.entity.user.WmUserIncome">
+		SELECT <include refid="wmUserIncomeColumns"/>,<include refid="publicColumns"/> FROM wm_user_income a <include refid="wmUserIncomeJoins"/> WHERE a.id = #{id} and a.del_flag = 0
+	</select>
+	
+	<select id="findList" resultType="com.thinkgem.jeesite.modules.wm.entity.user.WmUserIncome">
+		select <include refid="wmUserIncomeColumns" />,<include refid="publicColumns"/> from wm_user_income a <include refid="wmUserIncomeJoins" />
+		<include refid="publicWhereSql"/> <include refid="publicSelect"/>
+	</select>
+	
+	<select id="getCountPage" resultType="int" parameterType="com.thinkgem.jeesite.modules.wm.entity.user.WmUserIncome">
+		select count(*) from wm_user_income a <include refid="wmUserIncomeJoins" /> <include refid="publicWhereSql"/> 
+	</select>
+	
+	<select id="getAllList" resultType="com.thinkgem.jeesite.modules.wm.entity.user.WmUserIncome">
+		select <include refid="wmUserIncomeColumns" />,<include refid="publicColumns"/> from wm_user_income a <include refid="wmUserIncomeJoins"/> where a.del_flag = 0 and a.is_enable = 1 order by a.order_no desc
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO wm_user_income(
+			id,
+			user_id,
+			income_amount,
+			income_type,
+			remark,
+			is_enable,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			order_no,
+			del_flag
+		) VALUES (
+			#{id},
+			#{user.id},
+			#{incomeAmount},
+			#{incomeType},
+			#{remark},
+			#{isEnable},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{orderNo},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE wm_user_income SET 	
+			user_id = #{user.id},
+			income_amount = #{incomeAmount},
+			income_type = #{incomeType},
+			remark = #{remark},
+			is_enable = #{isEnable},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			order_no = #{orderNo}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

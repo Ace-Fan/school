@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.sc.dao.teacher.ScTeacherDao">
+    
+	<sql id="publicColumns">
+		a.id as "id",
+		a.remark as "remark",
+		a.is_enable as "isEnable",
+		a.create_by as "createBy",
+		a.create_date as "createDate",
+		a.update_by as "updateBy",
+		a.update_date as "updateDate",
+		a.order_no as "orderNo",
+		a.del_flag as "delFlag"
+	</sql>
+	
+	<sql id="insertColumns">
+		remark,
+		is_enable,
+		order_no, 
+		del_flag,
+		create_by,
+		create_date
+	</sql>
+	
+	<sql id="insertValue">
+		#{remark},
+		#{isEnable},
+		#{orderNo},
+		0,
+		#{createBy},
+		#{createDate}
+	</sql>
+	
+    <sql id="updateColumns">
+    	,remark = #{remark}
+		,is_enable = #{isEnable}
+		,order_no = #{orderNo}
+		,update_by = #{updateBy}
+		,update_date = #{updateDate}
+    </sql>
+    
+    <sql id="publicWhereSql">
+    <where>
+			a.del_flag = 0
+			<if test="code != null and code != '' ">
+				and a.code like concat('%',#{code},'%')
+			</if>
+			<if test="name != null and name != '' ">
+				and a.name like concat('%',#{name},'%')
+			</if>
+			<if test="isEnable != null and isEnable != '' ">
+				and a.is_enable = #{isEnable}
+			</if>
+			<if test="province != null and province != ''">
+            	and a.province = #{province}
+            </if>
+			 <if test="county != null and county != ''">
+            	and a.county = #{county}
+            </if>
+            <if test="city != null and city != ''">
+            	and a.city = #{city}
+            </if>
+		</where>
+    </sql>
+    
+	<sql id="publicSelect">
+	order by a.create_date desc
+		<if test="page!=null and limit!=null">
+			limit #{page}, #{limit}
+		</if>
+	</sql>
+    
+	<sql id="scTeacherColumns">
+		a.code AS "code",
+		a.name AS "name",
+		a.sex AS "sex",
+		a.age AS "age",
+		a.jg_id AS "jgId",
+		a.xz_id AS "xzId",
+		a.mz_id AS "mzId",
+		a.zzmm_id AS "zzmmId",
+		a.sx_id AS "sxId",
+		a.phone AS "phone",
+		a.emergency_contact AS "emergencyContact",
+		a.emergency_tel AS "emergencyTel",
+		a.id_num AS "idNum",
+		a.wx_num AS "wxNum",
+		a.qq_num AS "qqNum",
+		a.email AS "email",
+		a.province AS "province",
+		a.city AS "city",
+		a.county AS "county",
+		a.address AS "address",
+		a.lng AS "lng",
+		a.lat AS "lat",
+		a.gl_birthday AS "glBirthday",
+		a.nl_birthday AS "nlBirthday",
+		a.registered_addr AS "registeredAddr",
+		a.birth_addr AS "birthAddr",
+		a.height AS "height",
+		a.blood_type AS "bloodType",
+		a.hoby AS "hoby",
+		a.teach_img AS "teachImg",
+		a.teach_cert AS "teachCert",
+		a.teach_biref AS "teachBiref"
+	</sql>
+	
+	<sql id="scTeacherJoins">
+	</sql>
+    
+	<select id="get" resultType="com.thinkgem.jeesite.modules.sc.entity.teacher.ScTeacher">
+		SELECT <include refid="scTeacherColumns"/>,<include refid="publicColumns"/> FROM sc_teacher a <include refid="scTeacherJoins"/> WHERE a.id = #{id} and a.del_flag = 0
+	</select>
+	
+	<!-- 根据类型ID集合获取信息 -->
+	<select id="getByCode" parameterType="java.util.List"
+	resultType="com.thinkgem.jeesite.modules.sc.entity.teacher.ScTeacher">
+	select 
+	<include refid="scTeacherColumns"/>
+	,
+	<include refid="publicColumns"/>
+	from sc_teacher a
+	where a.del_flag = 0 and a.code = #{code}
+	</select>
+	
+	<!-- 根据主键集合获取持久层信息-->
+	<select id="getByBatchId" parameterType="java.util.List" resultType="com.thinkgem.jeesite.modules.sc.entity.teacher.ScTeacher">
+       	select <include refid="scTeacherColumns" />,<include refid="publicColumns"/> from sc_teacher a <include refid="scTeacherJoins"/>
+       	where a.del_flag = 0 and a.id in
+       	<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+      		#{item}
+		</foreach>
+	</select> 
+	
+	
+	<select id="findList" resultType="com.thinkgem.jeesite.modules.sc.entity.teacher.ScTeacher">
+		select <include refid="scTeacherColumns" />,<include refid="publicColumns"/> from sc_teacher a <include refid="scTeacherJoins" />
+		<include refid="publicWhereSql"/> <include refid="publicSelect"/>
+	</select>
+	
+	<select id="getCountPage" resultType="int" parameterType="com.thinkgem.jeesite.modules.sc.entity.teacher.ScTeacher">
+		select count(*) from sc_teacher a <include refid="scTeacherJoins" /> <include refid="publicWhereSql"/> 
+	</select>
+	
+	<select id="getAllList" resultType="com.thinkgem.jeesite.modules.sc.entity.teacher.ScTeacher">
+		select <include refid="scTeacherColumns" />,<include refid="publicColumns"/> from sc_teacher a <include refid="scTeacherJoins"/> where a.del_flag = 0 and a.is_enable = 1 order by a.order_no desc
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO sc_teacher(
+			code,
+			name,
+			sex,
+			age,
+			jg_id,
+			xz_id,
+			mz_id,
+			zzmm_id,
+			sx_id,
+			phone,
+			emergency_contact,
+			emergency_tel,
+			id_num,
+			wx_num,
+			qq_num,
+			email,
+			province,
+			city,
+			county,
+			address,
+			lng,
+			lat,
+			gl_birthday,
+			nl_birthday,
+			registered_addr,
+			birth_addr,
+			height,
+			blood_type,
+			hoby,
+			teach_img,
+			teach_cert,
+			teach_biref,
+			<include refid="insertColumns" />
+		) VALUES (
+			#{code},
+			#{name},
+			#{sex},
+			#{age},
+			#{jgId},
+			#{xzId},
+			#{mzId},
+			#{zzmmId},
+			#{sxId},
+			#{phone},
+			#{emergencyContact},
+			#{emergencyTel},
+			#{idNum},
+			#{wxNum},
+			#{qqNum},
+			#{email},
+			#{province},
+			#{city},
+			#{county},
+			#{address},
+			#{lng},
+			#{lat},
+			#{glBirthday},
+			#{nlBirthday},
+			#{registeredAddr},
+			#{birthAddr},
+			#{height},
+			#{bloodType},
+			#{hoby},
+			#{teachImg},
+			#{teachCert},
+			#{teachBiref},
+			<include refid="insertValue" />
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE sc_teacher SET 	
+			code = #{code},
+			name = #{name},
+			sex = #{sex},
+			age = #{age},
+			jg_id = #{jgId},
+			xz_id = #{xzId},
+			mz_id = #{mzId},
+			zzmm_id = #{zzmmId},
+			sx_id = #{sxId},
+			phone = #{phone},
+			emergency_contact = #{emergencyContact},
+			emergency_tel = #{emergencyTel},
+			id_num = #{idNum},
+			wx_num = #{wxNum},
+			qq_num = #{qqNum},
+			email = #{email},
+			province = #{province},
+			city = #{city},
+			county = #{county},
+			address = #{address},
+			lng = #{lng},
+			lat = #{lat},
+			gl_birthday = #{glBirthday},
+			nl_birthday = #{nlBirthday},
+			registered_addr = #{registeredAddr},
+			birth_addr = #{birthAddr},
+			height = #{height},
+			blood_type = #{bloodType},
+			hoby = #{hoby},
+			teach_img = #{teachImg},
+			teach_cert = #{teachCert},
+			teach_biref = #{teachBiref}
+			<include refid="updateColumns"/>
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

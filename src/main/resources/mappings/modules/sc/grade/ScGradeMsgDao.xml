@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.thinkgem.jeesite.modules.sc.dao.grade.ScGradeMsgDao">
+
+	<sql id="publicColumns">
+		a.id as "id",
+		a.is_enable as "isEnable",
+		a.create_by as
+		"createBy",
+		a.create_date as "createDate",
+		a.update_by as "updateBy",
+		a.update_date as "updateDate",
+		a.order_no as "orderNo",
+		a.del_flag as
+		"delFlag"
+	</sql>
+
+	<sql id="insertColumns">
+		is_enable,
+		order_no,
+		del_flag,
+		create_by,
+		create_date
+	</sql>
+
+	<sql id="insertValue">
+		#{isEnable},
+		#{orderNo},
+		0,
+		#{createBy},
+		#{createDate}
+	</sql>
+
+	<sql id="updateColumns">
+		,is_enable = #{isEnable}
+		,order_no = #{orderNo}
+		,update_by =
+		#{updateBy}
+		,update_date = #{updateDate}
+	</sql>
+
+	<sql id="publicWhereSql">
+		<where>
+			a.del_flag = 0
+			<if test="teachId != null and teachId != '' ">
+				and a.teach_id = #{teachId}
+			</if>
+			<if test="typeId != null and typeId != '' ">
+				and a.type_id = #{typeId}
+			</if>
+			<if test="itemId != null and itemId != '' ">
+				and a.item_id = #{itemId}
+			</if>
+			<if test="grade != null and grade !='' ">
+				and a.grade = #{grade}
+			</if>
+			<if test="semId != null and semId != '' ">
+				and a.sem_id = #{semId}
+			</if>
+			<if test="isEnable != null and isEnable != '' ">
+				and a.is_enable = #{isEnable}
+			</if>
+		</where>
+	</sql>
+
+	<sql id="publicSelect">
+		order by a.create_date asc
+		<if test="page != null and limit != null">
+			limit #{page}, #{limit}
+		</if>
+	</sql>
+
+	<sql id="scGradeMsgColumns">
+		a.teach_id AS "teachId",
+		a.type_id AS "typeId",
+		a.item_id AS
+		"itemId",
+		a.sem_id AS "semId",
+		a.grade AS "grade",
+		b.name AS "teachName",
+		c.name AS
+		"gradeType",
+		d.name AS "gradeTerm",
+		e.name AS "semester"
+	</sql>
+
+	<sql id="scGradeMsgJoins">
+		left join sc_teacher b on b.id = a.teach_id
+		left join
+		sc_grade_type c on c.id = a.type_id
+		left join sc_grade_term d on d.id =
+		a.item_id
+		left join sc_semester e on e.id = a.sem_id
+	</sql>
+
+	<select id="get"
+		resultType="com.thinkgem.jeesite.modules.sc.entity.grade.ScGradeMsg">
+		SELECT
+		<include refid="scGradeMsgColumns" />
+		,
+		<include refid="publicColumns" />
+		FROM sc_grade_msg a
+		<include refid="scGradeMsgJoins" />
+		WHERE a.id = #{id} and a.del_flag = 0
+	</select>
+
+	<!-- 根据主键集合获取持久层信息 -->
+	<select id="getByBatchId" parameterType="java.util.List"
+		resultType="com.thinkgem.jeesite.modules.sc.entity.grade.ScGradeMsg">
+		select
+		<include refid="scGradeMsgColumns" />
+		,
+		<include refid="publicColumns" />
+		from sc_grade_msg a
+		<include refid="scGradeMsgJoins" />
+		where a.del_flag = 0 and a.id in
+		<foreach item="item" index="index" collection="list" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+	
+	<!-- 根据学期ID集合获取信息 -->
+	<select id="getBySemId" parameterType="java.util.List"
+	resultType="com.thinkgem.jeesite.modules.sc.entity.grade.ScGradeMsg">
+	select 
+	<include refid="scGradeMsgColumns"/>
+	,
+	<include refid="publicColumns"/>
+	from sc_grade_msg a
+	<include refid="scGradeMsgJoins"/>
+	where a.del_flag = 0 and a.sem_id = #{semId}
+	</select>
+	
+	<!-- 根据教师ID集合获取信息 -->
+	<select id="getByTeachId" parameterType="java.util.List"
+	resultType="com.thinkgem.jeesite.modules.sc.entity.grade.ScGradeMsg">
+	select 
+	<include refid="scGradeMsgColumns"/>
+	,
+	<include refid="publicColumns"/>
+	from sc_grade_msg a
+	<include refid="scGradeMsgJoins"/>
+	where a.del_flag = 0 and a.teach_id = #{teachId}
+	</select>
+	
+	<select id="findList"
+		resultType="com.thinkgem.jeesite.modules.sc.entity.grade.ScGradeMsg">
+		select
+		<include refid="scGradeMsgColumns" />
+		,
+		<include refid="publicColumns" />
+		from sc_grade_msg a
+		<include refid="scGradeMsgJoins" />
+		<include refid="publicWhereSql" />
+		<include refid="publicSelect" />
+	</select>
+
+	<select id="getCountPage" resultType="int"
+		parameterType="com.thinkgem.jeesite.modules.sc.entity.grade.ScGradeMsg">
+		select count(*) from sc_grade_msg a
+		<include refid="scGradeMsgJoins" />
+		<include refid="publicWhereSql" />
+	</select>
+
+	<select id="getAllList"
+		resultType="com.thinkgem.jeesite.modules.sc.entity.grade.ScGradeMsg">
+		select
+		<include refid="scGradeMsgColumns" />
+		,
+		<include refid="publicColumns" />
+		from sc_grade_msg a
+		<include refid="scGradeMsgJoins" />
+		where a.del_flag = 0 and a.is_enable = 1 order by a.order_no desc
+	</select>
+
+	<insert id="insert">
+		INSERT INTO sc_grade_msg(
+		teach_id,
+		type_id,
+		item_id,
+		sem_id,
+		grade,
+		<include refid="insertColumns" />
+		) VALUES (
+		#{teachId},
+		#{typeId},
+		#{itemId},
+		#{semId},
+		#{grade},
+		<include refid="insertValue" />
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE sc_grade_msg SET
+		teach_id = #{teachId},
+		type_id = #{typeId},
+		item_id = #{itemId},
+		sem_id = #{semId},
+		grade = #{grade}
+		<include refid="updateColumns" />
+		WHERE id = #{id}
+	</update>
+
+</mapper>

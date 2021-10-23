@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.wisdom.dao.agree.WisAgreementTypeDao">
+    
+    <!-- 通用查询字段SQL -->
+	<sql id="publicColumns">
+		a.id AS "id",
+		a.remark as "remark",
+		a.is_enable as "isEnable",
+		a.create_by as "createBy",
+		a.create_date as "createDate",
+		a.update_by as "updateBy",
+		a.update_date as "updateDate",
+		a.order_no as "orderNo",
+		a.del_flag as "delFlag"
+	</sql>
+
+	<!-- 通用查询SQL -->
+	<sql id="publicWhereSql">
+		<where>
+			a.del_flag = 0
+			<if test="agreementCode != null and agreementCode != '' ">
+				and a.agreement_code like concat('%',#{agreementCode},'%')
+			</if>
+			<if test="agreementType != null and agreementType != '' ">
+				and a.agreement_type like concat('%',#{agreementType},'%')
+			</if>
+			<if test="isEnable != null and isEnable != '' ">
+				and a.is_enable = #{isEnable}
+			</if>
+		</where>
+	</sql>
+
+	<!-- 通用查询SQL -->
+	<sql id="publicSelect">
+		order by a.create_date desc
+		<if test="page != null and limit != null">
+			limit #{page}, #{limit}
+		</if>
+	</sql>
+	
+	<!-- 新增通用字段SQL -->
+	<sql id="insertColumns">
+		remark,
+		is_enable,
+		order_no,
+		del_flag,
+		create_by,
+		create_date
+	</sql>
+
+	<!-- 新增通用关联字段SQL -->
+	<sql id="insertValue">
+		#{remark},
+		#{isEnable},
+		#{orderNo},
+		0,
+		#{createBy},
+		#{createDate}
+	</sql>
+
+	<!-- 修改通用字段SQL -->
+	<sql id="updateColumns">
+		,remark = #{remark}
+		,is_enable = #{isEnable}
+		,order_no = #{orderNo}
+		,update_by = #{updateBy}
+		,update_date = #{updateDate}
+	</sql>
+    
+	<sql id="wisAgreementTypeColumns">
+		a.agreement_code AS "agreementCode",
+		a.agreement_type AS "agreementType"
+	</sql>
+	
+	<sql id="wisAgreementTypeJoins">
+	</sql>
+    
+    <!-- 根据ID获取值 -->
+    <select id="get" resultType="com.thinkgem.jeesite.modules.wisdom.entity.agree.WisAgreementType">
+        SELECT <include refid="wisAgreementTypeColumns" />,<include refid="publicColumns"/> FROM wis_agreement_type a <include refid="wisAgreementTypeJoins"/> WHERE a.id = #{id}
+    </select>
+    
+    <!-- 根据主键集合获取持久层信息 -->
+	<select id="getByBatchId" parameterType="java.util.List" resultType="com.thinkgem.jeesite.modules.wisdom.entity.agree.WisAgreementType">
+       	select <include refid="wisAgreementTypeColumns" />,<include refid="publicColumns"/> from wis_agreement_type a <include refid="wisAgreementTypeJoins"/>
+       	where a.del_flag = 0 and a.id in
+       	<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+      		#{item}
+		</foreach>
+	</select>
+    
+    <!-- 依据持久层获取分页信息   -->
+	<select id="findList" resultType="com.thinkgem.jeesite.modules.wisdom.entity.agree.WisAgreementType">
+		select <include refid="wisAgreementTypeColumns" />,<include refid="publicColumns"/> from wis_agreement_type a <include refid="wisAgreementTypeJoins" />
+		<include refid="publicWhereSql"/> <include refid="publicSelect"/>
+	</select>
+	
+	<!-- 依据持久层获取分页总数   -->
+	<select id="getCountPage" resultType="int" parameterType="com.thinkgem.jeesite.modules.wisdom.entity.agree.WisAgreementType">
+		select count(*) from wis_agreement_type a <include refid="wisAgreementTypeJoins" /> <include refid="publicWhereSql"/> 
+	</select>
+    
+    <!-- 获得全部信息   -->
+	<select id="getAllList" resultType="com.thinkgem.jeesite.modules.wisdom.entity.agree.WisAgreementType">
+		select <include refid="wisAgreementTypeColumns" />,<include refid="publicColumns"/> from wis_agreement_type a <include refid="wisAgreementTypeJoins"/> where a.del_flag = 0
+	</select>
+    
+	<insert id="insert">
+		INSERT INTO wis_agreement_type(
+			agreement_code,
+			agreement_type,
+			<include refid="insertColumns"/>
+		) VALUES (
+			#{agreementCode},
+			#{agreementType},
+			<include refid="insertValue"/>
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE wis_agreement_type SET 	
+			agreement_code = #{agreementCode}
+			,agreement_type = #{agreementType}
+			<include refid="updateColumns"/>
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

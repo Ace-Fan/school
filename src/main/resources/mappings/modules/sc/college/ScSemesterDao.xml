@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.sc.dao.college.ScSemesterDao">
+    
+	<sql id="publicColumns">
+		a.id as "id",
+		a.is_enable as "isEnable",
+		a.create_by as "createBy",
+		a.create_date as "createDate",
+		a.update_by as "updateBy",
+		a.update_date as "updateDate",
+		a.order_no as "orderNo",
+		a.del_flag as "delFlag"
+	</sql>
+	
+	<sql id="insertColumns">
+		is_enable,
+		order_no, 
+		del_flag,
+		create_by,
+		create_date
+	</sql>
+	
+	<sql id="insertValue">
+		#{isEnable},
+		#{orderNo},
+		0,
+		#{createBy},
+		#{createDate}
+	</sql>
+	
+    <sql id="updateColumns">
+		,is_enable = #{isEnable}
+		,order_no = #{orderNo}
+		,update_by = #{updateBy}
+		,update_date = #{updateDate}
+    </sql>
+    
+    <sql id="publicWhereSql">
+    <where>
+			a.del_flag = 0
+			<if test="code != null and code != '' ">
+				and a.code like concat('%',#{code},'%')
+			</if>
+			<if test="name != null and name != '' ">
+				and a.name like concat('%',#{name},'%')
+			</if>
+			<if test="isEnable != null and isEnable != '' ">
+				and a.is_enable = #{isEnable}
+			</if>
+		</where>
+    </sql>
+    
+	<sql id="publicSelect">
+	order by a.create_date asc
+		<if test="page != null and limit != null">
+			limit #{page}, #{limit}
+		</if>
+	</sql>
+    
+	<sql id="scSemesterColumns">
+		a.code AS "code",
+		a.name AS "name"
+	</sql>
+	
+	<sql id="scSemesterJoins">
+	</sql>
+    
+	<select id="get" resultType="com.thinkgem.jeesite.modules.sc.entity.college.ScSemester">
+		SELECT <include refid="scSemesterColumns"/>,<include refid="publicColumns"/> FROM sc_semester a <include refid="scSemesterJoins"/> WHERE a.id = #{id} and a.del_flag = 0
+	</select>
+	
+	<select id="findList" resultType="com.thinkgem.jeesite.modules.sc.entity.college.ScSemester">
+		select <include refid="scSemesterColumns" />,<include refid="publicColumns"/> from sc_semester a <include refid="scSemesterJoins" />
+		<include refid="publicWhereSql"/> <include refid="publicSelect"/>
+	</select>
+	
+	<select id="getCountPage" resultType="int" parameterType="com.thinkgem.jeesite.modules.sc.entity.college.ScSemester">
+		select count(*) from sc_semester a <include refid="scSemesterJoins" /> <include refid="publicWhereSql"/> 
+	</select>
+	
+	<select id="getAllList" resultType="com.thinkgem.jeesite.modules.sc.entity.college.ScSemester">
+		select <include refid="scSemesterColumns" />,<include refid="publicColumns"/> from sc_semester a <include refid="scSemesterJoins"/> where a.del_flag = 0 and a.is_enable = 1 order by a.order_no desc
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO sc_semester(
+			code,
+			name,
+			<include refid="insertColumns" />
+		) VALUES (
+			#{code},
+			#{name},
+			<include refid="insertValue" />
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE sc_semester SET 	
+			code = #{code}
+			,name = #{name}
+			<include refid="updateColumns"/>
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

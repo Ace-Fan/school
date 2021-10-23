@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.wisdom.dao.base.BaseGenTableDao">
+    
+	<!-- 获得全部信息   -->
+	<select id="getAllList" resultType="com.thinkgem.jeesite.modules.wisdom.entity.base.BaseGenTable">
+		SELECT t.table_name AS "name", 
+			   t.TABLE_COMMENT AS "comments",
+			   CONCAT(t.table_name,':',t.TABLE_COMMENT) as "tableComment"
+			FROM information_schema.`TABLES` t 
+			WHERE t.TABLE_SCHEMA = (select database())
+			ORDER BY t.TABLE_NAME
+	</select>
+	
+</mapper>

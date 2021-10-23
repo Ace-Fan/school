@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+	<name>controller</name>
+	<filePath>src/main/java/${packageName}/${moduleName}/web/${subModuleName}</filePath>
+	<fileName>${ClassName}Controller.java</fileName>
+	<content><![CDATA[
+package ${packageName}.${moduleName}.web<#if subModuleName != "">.${subModuleName}</#if>;
+
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.thinkgem.jeesite.common.crud.BaseCrudController;
+import com.thinkgem.jeesite.common.mapper.JsonMapper;
+import com.thinkgem.jeesite.common.utils.ResultPage;
+import com.thinkgem.jeesite.common.utils.StringUtils;
+import com.thinkgem.jeesite.common.utils.Token;
+import ${packageName}.${moduleName}.entity<#if subModuleName != "">.${subModuleName}</#if>.${ClassName};
+import ${packageName}.${moduleName}.service<#if subModuleName != "">.${subModuleName}</#if>.${ClassName}Service;
+import ${packageName}.${moduleName}.dao<#if subModuleName != "">.${subModuleName}</#if>.${ClassName}Dao;
+
+import net.sf.json.JSONObject;
+
+/**
+ * @title ${functionName}控制层
+ * @author ${functionAuthor}
+ * @version ${functionVersion}
+ */
+@Controller
+@RequestMapping(value = "${r"${adminPath}"}/${urlPrefix}")
+public class ${ClassName}Controller extends BaseCrudController<${ClassName}Service, ${ClassName}Dao, ${ClassName}> {
+
+	String list = "${lastPackageName}/${viewPrefix}List";		// 表格页面
+	String form = "${lastPackageName}/${viewPrefix}Form";		// 表单页面
+	String tableName = new ${ClassName}().getTableName();		// 数据表名
+	
+	// 通用model
+	public void model(Model model) {
+		model.addAttribute("rootUrl", "/${urlPrefix}"); // rootUrl 访问路径
+		model.addAttribute("tableName", tableName); // tableName 表名
+	}
+	
+	// JSON对象字符串封装为对象
+	public ${ClassName} repJson(String json) { 
+		return (${ClassName}) JSONObject.toBean(toJsonObject(json), ${ClassName}.class);
+	}
+	
+	// 获取模板分页信息
+	@RequestMapping(value = "/list")
+	@ResponseBody
+	@Token(save = true)
+	public ResultPage<List<${ClassName}>> findAllList(${ClassName} entity) {
+		return super.findList(entity);
+	}
+	
+	// 根据主键获取模板信息
+	@ModelAttribute
+	public ${ClassName} get(@RequestParam(required = false) String id) {
+		${ClassName} entity = null;
+		if (StringUtils.isNotBlank(id)) { entity = super.entityService.get(id); }
+		if (entity == null) { entity = new ${ClassName}(); }
+		return entity;
+	}
+	
+	// 跳转到表格页面
+	@RequestMapping(value = { "show", "" })
+	public String list(String localStoragePage, Model model) {
+		model(model); // 通用model
+		return list;
+	}
+	
+	// 调整到修改或者查看页面
+	@RequestMapping(value = "getShow")
+	public String form(String id, String type, Model model) {
+		model(model); // 通用model方法
+		modelType(type, model);
+		return form;
+	}
+	
+	// 添加或修改信息
+	@RequestMapping(value = "save")
+	@ResponseBody
+	public void save(String json, HttpServletResponse response, HttpServletRequest request) throws Exception {
+		response.getWriter().write(JsonMapper.getInstance().toJson(saveService(repJson(json), tableName)));
+	}
+
+}]]>
+	</content>
+</template>

@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.wisdom.dao.base.WisDataImportTabDao">
+    
+	<!-- 通用查询字段SQL -->
+	<sql id="publicColumns">
+		a.id as "id",
+		a.is_enable as "isEnable",
+		a.create_by as "createBy",
+		a.create_date as "createDate",
+		a.update_by as "updateBy",
+		a.update_date as "updateDate",
+		a.order_no as "orderNo",
+		a.del_flag as "delFlag"
+	</sql>
+    
+	<!-- 新增通用字段SQL -->
+	<sql id="insertColumns">
+		is_enable,
+		order_no, 
+		del_flag,
+		create_by,
+		create_date
+	</sql>
+    
+    <!-- 新增通用关联字段SQL -->
+	<sql id="insertValue">
+		#{isEnable},
+		#{orderNo},
+		0,
+		#{createBy},
+		#{createDate}
+	</sql>
+	
+	<!-- 修改通用字段SQL -->
+    <sql id="updateColumns">
+		,is_enable = #{isEnable}
+		,update_by = #{updateBy}
+		,update_date = #{updateDate}
+    </sql>
+    
+    <!-- 通用查询SQL -->
+    <sql id="publicWhereSql">
+    	<where>
+			a.del_flag = 0
+			<if test="tabName != null and tabName != ''">
+			 	and a.table_name like concat ('%', #{tabName}, '%')
+			</if>
+			<if test="tableCode != null and tableCode != ''">
+			 	and a.table_code like concat ('%', #{tableCode}, '%')
+			</if>
+			<if test="isEnable != null and isEnable != '' ">
+				and a.is_enable = #{isEnable}
+			</if>
+		</where>
+    </sql>
+    
+    <!-- 通用查询SQL -->
+	<sql id="publicSelect">
+		order by a.create_date desc
+		<if test="page!=null and limit!=null">
+			limit #{page}, #{limit}
+		</if>
+	</sql>
+    
+	<sql id="wisDataImportTabColumns">
+		a.table_name AS "tabName",
+		a.table_code AS "tableCode",
+		a.file_name AS "fileName",
+		a.file_url AS "fileUrl",
+		a.excel_header AS "excelHeader"
+	</sql>
+	
+	<sql id="wisDataImportTabJoins">
+	</sql>
+    
+	<select id="get" resultType="com.thinkgem.jeesite.modules.wisdom.entity.base.WisDataImportTab">
+		SELECT <include refid="wisDataImportTabColumns"/>,<include refid="publicColumns"/> FROM wis_data_import_tab a <include refid="wisDataImportTabJoins"/> WHERE a.id = #{id} and a.del_flag = 0
+	</select>
+	
+	<!-- 根据主键集合获取持久层信息 -->
+	<select id="getByBatchId" parameterType="java.util.List" resultType="com.thinkgem.jeesite.modules.wisdom.entity.base.WisDataImportTab">
+       	select <include refid="wisDataImportTabColumns" />,<include refid="publicColumns"/> from wis_data_import_tab a <include refid="wisDataImportTabJoins"/>
+       	where a.del_flag = 0 and a.id in
+       	<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+      		#{item}
+		</foreach>
+	</select>
+	
+	<select id="findList" resultType="com.thinkgem.jeesite.modules.wisdom.entity.base.WisDataImportTab">
+		select <include refid="wisDataImportTabColumns" />,<include refid="publicColumns"/> from wis_data_import_tab a <include refid="wisDataImportTabJoins" />
+		<include refid="publicWhereSql"/> <include refid="publicSelect"/>
+	</select>
+	
+	<select id="getCountPage" resultType="int" parameterType="com.thinkgem.jeesite.modules.wisdom.entity.base.WisDataImportTab">
+		select count(*) from wis_data_import_tab a <include refid="wisDataImportTabJoins" /> <include refid="publicWhereSql"/> 
+	</select>
+	
+	<select id="getAllList" resultType="com.thinkgem.jeesite.modules.wisdom.entity.base.WisDataImportTab">
+		select <include refid="wisDataImportTabColumns" />,<include refid="publicColumns"/> from wis_data_import_tab a <include refid="wisDataImportTabJoins"/> where a.del_flag = 0 order by a.order_no desc
+	</select>
+	
+	<select id="getExcelFileUrlByTabCode" resultType="com.thinkgem.jeesite.modules.wisdom.entity.base.WisDataImportTab">
+		select <include refid="wisDataImportTabColumns" />,<include refid="publicColumns"/> from wis_data_import_tab a <include refid="wisDataImportTabJoins"/> where a.del_flag = 0 and a.is_enable = 1
+		<if test="tableName != null and tableName != '' ">
+			and table_code = #{tableName}
+		</if>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO wis_data_import_tab(
+			table_name,
+			table_code,
+			file_name,
+			file_url,
+			excel_header,
+			<include refid="insertColumns"/>
+		) VALUES (
+			#{tabName},
+			#{tableCode},
+			#{fileName},
+			#{fileUrl},
+			#{excelHeader},
+			<include refid="insertValue"/>
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE wis_data_import_tab SET 	
+			table_name = #{tabName}
+			,table_code = #{tableCode}
+			,file_name = #{fileName}
+			,file_url = #{fileUrl}
+			<if test="excelHeader != null and excelHeader != '' ">
+				,excel_header = #{excelHeader}
+			</if>
+			<include refid="updateColumns"/>
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

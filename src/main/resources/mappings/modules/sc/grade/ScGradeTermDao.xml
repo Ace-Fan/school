@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.sc.dao.grade.ScGradeTermDao">
+    
+	<sql id="publicColumns">
+		a.id as "id",
+		a.is_enable as "isEnable",
+		a.create_by as "createBy",
+		a.create_date as "createDate",
+		a.update_by as "updateBy",
+		a.update_date as "updateDate",
+		a.order_no as "orderNo",
+		a.del_flag as "delFlag"
+	</sql>
+	
+	<sql id="insertColumns">
+		is_enable,
+		order_no, 
+		del_flag,
+		create_by,
+		create_date
+	</sql>
+	
+	<sql id="insertValue">
+		#{isEnable},
+		#{orderNo},
+		0,
+		#{createBy},
+		#{createDate}
+	</sql>
+	
+    <sql id="updateColumns">
+		,is_enable = #{isEnable}
+		,order_no = #{orderNo}
+		,update_by = #{updateBy}
+		,update_date = #{updateDate}
+    </sql>
+    
+    <sql id="publicWhereSql">
+    <where>
+			a.del_flag = 0
+			<if test="code != null and code != '' ">
+				and a.code = #{code}
+			</if>
+			<if test="name != null and name != '' ">
+				and a.name like concat('%',#{name},'%')
+			</if>
+			<if test="typeId != null and typeId !='' ">
+			     and  a.type_id =#{typeId}
+			</if>
+			<if test="isEnable != null and isEnable != '' ">
+				and a.is_enable = #{isEnable}
+			</if>
+		</where>
+    </sql>
+    
+	<sql id="publicSelect">
+	order by a.create_date asc
+		<if test="page != null and limit != null">
+			limit #{page}, #{limit}
+		</if>
+	</sql>
+    
+	<sql id="scGradeTermColumns">
+		a.type_id AS "typeId",
+		a.code AS "code",
+		a.name AS "name",
+		b.name AS "gradeType"
+	</sql>
+	
+	<sql id="scGradeTermJoins">
+	left join sc_grade_type b on b.id = a.type_id
+	</sql>
+    
+	<select id="get" resultType="com.thinkgem.jeesite.modules.sc.entity.grade.ScGradeTerm">
+		SELECT <include refid="scGradeTermColumns"/>,<include refid="publicColumns"/> FROM sc_grade_term a <include refid="scGradeTermJoins"/> WHERE a.id = #{id} and a.del_flag = 0
+	</select>
+	
+	<!-- 根据主键集合获取持久层信息 -->
+	<select id="getByBatchId" parameterType="java.util.List" resultType="com.thinkgem.jeesite.modules.sc.entity.grade.ScGradeTerm">
+       	select <include refid="scGradeTermColumns" />,<include refid="publicColumns"/> from sc_grade_term a <include refid="scGradeTermJoins"/>
+       	where a.del_flag = 0 and a.id in
+       	<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+      		#{item}
+		</foreach>
+	</select>
+	
+		<!-- 根据类型ID集合获取信息 -->
+	<select id="getByTypeId" parameterType="java.util.List"
+	resultType="com.thinkgem.jeesite.modules.sc.entity.grade.ScGradeTerm">
+	select 
+	<include refid="scGradeTermColumns"/>
+	,
+	<include refid="publicColumns"/>
+	from sc_grade_term a
+	<include refid="scGradeTermJoins"/>
+	where a.del_flag = 0 and a.type_Id = #{typeId}
+	</select>
+	
+	<select id="findList" resultType="com.thinkgem.jeesite.modules.sc.entity.grade.ScGradeTerm">
+		select <include refid="scGradeTermColumns" />,<include refid="publicColumns"/> from sc_grade_term a <include refid="scGradeTermJoins" />
+		<include refid="publicWhereSql"/> <include refid="publicSelect"/>
+	</select>
+	
+	<select id="getCountPage" resultType="int" parameterType="com.thinkgem.jeesite.modules.sc.entity.grade.ScGradeTerm">
+		select count(*) from sc_grade_term a <include refid="scGradeTermJoins" /> <include refid="publicWhereSql"/> 
+	</select>
+	
+	<select id="getAllList" resultType="com.thinkgem.jeesite.modules.sc.entity.grade.ScGradeTerm">
+		select <include refid="scGradeTermColumns" />,<include refid="publicColumns"/> from sc_grade_term a <include refid="scGradeTermJoins"/> where a.del_flag = 0 and a.is_enable = 1 order by a.order_no asc
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO sc_grade_term(
+			type_id,
+			code,
+			name,
+			<include refid="insertColumns" />
+		) VALUES (
+		    #{typeId},
+			#{code},
+			#{name},
+			<include refid="insertValue" />
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE sc_grade_term SET 	
+			type_id = #{typeId}
+				,code = #{code}
+				,name = #{name}
+			<include refid="updateColumns"/>
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

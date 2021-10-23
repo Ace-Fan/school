@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.wisdom.dao.base.WisCommunityInfoDao">
+    
+    <!-- 通用查询字段SQL -->
+	<sql id="publicColumns">
+		a.id AS "id",
+		a.remark as "remark",
+		a.is_enable as "isEnable",
+		a.create_by as "createBy",
+		a.create_date as "createDate",
+		a.update_by as "updateBy",
+		a.update_date as "updateDate",
+		a.order_no as "orderNo",
+		a.del_flag as "delFlag"
+	</sql>
+
+	<!-- 通用查询SQL -->
+	<sql id="publicWhereSql">
+		<where>
+			a.del_flag = 0
+			<if test="name != null and name != '' ">
+				and a.name like concat('%',#{name},'%')
+			</if>
+			<if test="address != null and address != '' ">
+				and a.address like concat('%',#{address},'%')
+			</if>
+			<if test="isEnable != null and isEnable != '' ">
+				and a.is_enable = #{isEnable}
+			</if>
+		</where>
+	</sql>
+
+	<!-- 通用查询SQL -->
+	<sql id="publicSelect">
+		order by a.create_date desc
+		<if test="page != null and limit != null">
+			limit #{page}, #{limit}
+		</if>
+	</sql>
+	
+	<!-- 新增通用字段SQL -->
+	<sql id="insertColumns">
+		remark,
+		is_enable,
+		order_no,
+		del_flag,
+		create_by,
+		create_date
+	</sql>
+
+	<!-- 新增通用关联字段SQL -->
+	<sql id="insertValue">
+		#{remark},
+		#{isEnable},
+		#{orderNo},
+		0,
+		#{createBy},
+		#{createDate}
+	</sql>
+
+	<!-- 修改通用字段SQL -->
+	<sql id="updateColumns">
+		,remark = #{remark}
+		,is_enable = #{isEnable}
+		,order_no = #{orderNo}
+		,update_by = #{updateBy}
+		,update_date = #{updateDate}
+	</sql>
+    
+	<sql id="wisCommunityInfoColumns">
+		a.name AS "name",
+		a.province AS "province",
+		a.city AS "city",
+		a.county AS "county",
+		a.address AS "address",
+		a.lng AS "lng",
+		a.lat AS "lat"
+	</sql>
+	
+	<sql id="wisCommunityInfoJoins">
+	</sql>
+    
+     <!-- 根据ID获取值 -->
+	<select id="get" resultType="com.thinkgem.jeesite.modules.wisdom.entity.base.WisCommunityInfo">
+		SELECT <include refid="wisCommunityInfoColumns" />,<include refid="publicColumns"/> FROM wis_community_info a <include refid="wisCommunityInfoJoins"/> WHERE a.id = #{id}
+	</select>
+	
+	<!-- 根据主键集合获取持久层信息 -->
+	<select id="getByBatchId" parameterType="java.util.List" resultType="com.thinkgem.jeesite.modules.wisdom.entity.base.WisCommunityInfo">
+       	select <include refid="wisCommunityInfoColumns" />,<include refid="publicColumns"/> from wis_community_info a <include refid="wisCommunityInfoJoins"/>
+       	where a.del_flag = 0 and a.id in
+       	<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+      		#{item}
+		</foreach>
+	</select>
+    
+    <!-- 依据持久层获取分页信息   -->
+	<select id="findList" resultType="com.thinkgem.jeesite.modules.wisdom.entity.base.WisCommunityInfo">
+		select <include refid="wisCommunityInfoColumns" />,<include refid="publicColumns"/> from wis_community_info a <include refid="wisCommunityInfoJoins" />
+		<include refid="publicWhereSql"/> <include refid="publicSelect"/>
+	</select>
+	
+	<!-- 依据持久层获取分页总数   -->
+	<select id="getCountPage" resultType="int" parameterType="com.thinkgem.jeesite.modules.wisdom.entity.base.WisCommunityInfo">
+		select count(*) from wis_community_info a <include refid="wisCommunityInfoJoins" /> <include refid="publicWhereSql"/> 
+	</select>
+    
+    <!-- 获得全部信息   -->
+	<select id="getAllList" resultType="com.thinkgem.jeesite.modules.wisdom.entity.base.WisCommunityInfo">
+		select <include refid="wisCommunityInfoColumns" />,<include refid="publicColumns"/> from wis_community_info a <include refid="wisCommunityInfoJoins"/> where a.del_flag = 0
+	</select>
+	
+	<!-- 前端分页查询信息 -->
+	<select id="findListQ" resultType="com.thinkgem.jeesite.modules.wisdom.entity.base.WisCommunityInfo">
+		select <include refid="wisCommunityInfoColumns" />,<include refid="publicColumns"/> from wis_community_info a <include refid="wisCommunityInfoJoins" />
+		where a.del_flag = 0 
+		<if test="entity.name != null and entity.name !='' ">
+			and a.name like concat('%',#{entity.name},'%')
+		</if>
+		<if test="entity.city != null and entity.city !='' ">
+			and a.city like concat('%',#{entity.city},'%')
+		</if>
+		order by a.create_date desc
+		<if test="pageNum != null and pageSize != null">
+			limit ${pageNum}, ${pageSize}
+		</if>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO wis_community_info(
+			name,
+			province,
+			city,
+			county,
+			address,
+			lng,
+			lat,
+			<include refid="insertColumns"/>
+		) VALUES (
+			#{name},
+			#{province},
+			#{city},
+			#{county},
+			#{address},
+			#{lng},
+			#{lat},
+			<include refid="insertValue"/>
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE wis_community_info SET 	
+			name = #{name}
+			,province = #{province}
+			,city = #{city}
+			,county = #{county}
+			,address = #{address}
+			,lng = #{lng}
+			,lat = #{lat}
+			<include refid="updateColumns"/>
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

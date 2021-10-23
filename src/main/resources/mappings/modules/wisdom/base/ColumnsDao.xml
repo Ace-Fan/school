@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.wisdom.dao.base.ColumnsDao">
+    
+	<!-- 根据主键获取持久层信息  -->
+	<select id="findList" resultType="com.thinkgem.jeesite.modules.wisdom.entity.base.Columns">
+		SELECT t.COLUMN_NAME AS fieldName, (CASE WHEN t.IS_NULLABLE = 'YES' THEN '1' ELSE '0' END) AS isNullable,
+		t.COLUMN_COMMENT AS fieldComment,t.COLUMN_TYPE AS fieldType, t.COLUMN_DEFAULT AS defaultVal 
+			FROM information_schema.`COLUMNS` t 
+			WHERE t.TABLE_SCHEMA = (select database())
+			<if test="tableName != null and tableName != '' ">
+				AND t.TABLE_NAME = (#{tableName})
+			</if>
+			ORDER BY t.ORDINAL_POSITION
+	</select>
+	
+</mapper>

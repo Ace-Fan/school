@@ -1,0 +1,33 @@
+/* 通用CSS */
+/* LIST页面-头部多重条件CSS样式设置 */
+/* 自定义input框CSS样式 */
+#selectDiv .selectDiv-input {
+	width: 12rem; 
+	margin-right: 0.5rem; 
+	margin-bottom: 0.5rem;
+}
+
+/* 自定义btn点击按钮 CSS样式 */
+#selectDiv .selectDiv-btn {
+	margin-bottom: 0.5rem; 
+	margin-right: 0.5rem;
+}
+
+/* 多选按钮的css */
+/* .laytable-cell-checkbox, .laytable-cell-numbers, .laytable-cell-radio, .laytable-cell-space {
+  	padding: 10px;
+  	text-align: center;
+} */
+.laytable-cell-checkbox, .laytable-cell-radio, .laytable-cell-space {
+  	padding: 10px;
+  	text-align: center;
+}
+
+/* 表格排序图标样式 */
+.moveSort {
+	width: 12px;
+    height: 17px;
+    margin-right: 10px;
+    cursor: pointer;
+    color: #155bd4;
+}

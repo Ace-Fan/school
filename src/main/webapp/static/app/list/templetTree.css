@@ -1,0 +1,102 @@
+/* 设置头部legend CSS样式 */
+.layui-field-title legend {
+	margin-left: 3rem;
+}
+
+/* 设置单文本框 文本框的宽度 */
+#dis .layui-form-item .layui-col-xs12 .layui-input-inline {
+	width: 40rem;
+}
+
+#dis .layui-form-item .layui-col-xs12 .layui-form-label {
+	width: 8rem;
+}
+
+/* 树形结构核心样式 */
+.div_h3title {
+	width: 100%;
+	border-bottom: 1px solid #EEEEEE;
+}
+
+.div_h3title i {
+	font-size: 24px;
+}
+
+.div_h3title span {
+	font-size: 24px;
+	display: inline-block;
+	padding: 20px 0px 20px 10px;
+}
+
+.position-a {
+	color: #01AAED;
+}
+
+.position-a:hover {
+	color: #01AAED;
+}
+
+.card {
+	margin: 10px;
+}
+
+.icon-div {
+	display: inline-block;
+	margin-right: 10px;
+	width: 40px;
+	height: 40px;
+	line-height: 40px;
+	border: 1px solid;
+	border-radius: 10px;
+	text-align: center;
+}
+
+.icon-div:hover {
+	color: orange !important;
+}
+
+.dtree-menubar {
+	width: 100px;
+}
+/* zdy主题风格*/
+
+.dtree-zdy-item-this {
+	background-color: #c2c2c2 !important;
+} /* 当前选中行样式*/
+
+.dtree-zdy-item:hover {
+	background-color: #f2f2f2 !important;
+} /* 行悬停样式*/
+
+.dtree-zdy-item cite {
+	font-size: 14px !important;
+} /* 行文字样式*/
+
+.dtree-zdy-item:hover cite {
+	color: #5FB878 !important;
+} /* 行悬停文字样式*/
+
+.dtree-zdy-iconfont {
+	font-size: 18px !important;
+} /* 一级图标、二级图标、复选框样式*/
+
+.dtree-zdy-ficon {
+	color: #2F4056 !important;
+} /*一级图标特定样式*/
+
+.dtree-zdy-icon {
+	color: #2F4056 !important;
+} /*二级图标特定样式*/
+
+.dtree-zdy-checkbox:hover {
+	color: #5FB878 !important;
+} /*复选框悬停样式*/
+
+.dtree-zdy-choose {
+	color: #5FB878 !important;
+} /* 复选框选中样式*/
+
+/* 多选按钮CSS */
+.laytable-cell-radio {
+   	padding: 15px;
+   }

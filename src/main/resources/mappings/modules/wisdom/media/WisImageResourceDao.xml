@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.wisdom.dao.media.WisImageResourceDao">
+    
+    <!-- 通用查询字段SQL -->
+	<sql id="publicColumns">
+		a.id AS "id",
+		a.remark as "remark",
+		a.is_enable as "isEnable",
+		a.create_by as "createBy",
+		a.create_date as "createDate",
+		a.update_by as "updateBy",
+		a.update_date as "updateDate",
+		a.order_no as "orderNo",
+		a.del_flag as "delFlag"
+	</sql>
+
+	<!-- 通用查询SQL -->
+	<sql id="publicWhereSql">
+		<where>
+			a.del_flag = 0
+			<if test="imgName != null and imgName != '' ">
+				and a.img_name like concat('%',#{imgName},'%')
+			</if>
+		</where>
+	</sql>
+
+	<!-- 通用查询SQL -->
+	<sql id="publicSelect">
+		order by a.create_date desc
+		<if test="page!=null and limit!=null">
+			limit #{page}, #{limit}
+		</if>
+	</sql>
+	
+	<!-- 新增通用字段SQL -->
+	<sql id="insertColumns">
+		remark,
+		is_enable,
+		order_no,
+		del_flag,
+		create_by,
+		create_date
+	</sql>
+
+	<!-- 新增通用关联字段SQL -->
+	<sql id="insertValue">
+		#{remark},
+		#{isEnable},
+		#{orderNo},
+		0,
+		#{createBy},
+		#{createDate}
+	</sql>
+
+	<!-- 修改通用字段SQL -->
+	<sql id="updateColumns">
+		,remark = #{remark}
+		,is_enable = #{isEnable}
+		,order_no = #{orderNo}
+		,update_by = #{updateBy}
+		,update_date = #{updateDate}
+	</sql>
+    
+	<sql id="wisImageResourceColumns">
+		a.img_name AS "imgName",
+		a.img_url AS "imgUrl",
+		a.img_width AS "imgWidth",
+		a.img_height AS "imgHeight",
+		a.img_format AS "imgFormat",
+		a.type_id AS "typeId",
+		a.img_limit_width AS "imgLimitWidth",
+		a.img_limit_height AS "imgLimitHeight",
+		a.img_limit_format AS "imgLimitFormat",
+		a.img_desc AS "imgDesc",
+		a.go_url AS "goUrl",
+		a.create_org AS "createOrg",
+		t.type_name AS "typeName",
+		t.type_code AS "typeCode"
+	</sql>
+	
+	<sql id="wisImageResourceJoins">
+		LEFT JOIN wis_image_type t on a.type_id = t.type_code
+	</sql>
+	
+	<!-- 根据ID获取值 -->
+    <select id="get" resultType="com.thinkgem.jeesite.modules.wisdom.entity.media.WisImageResource">
+        SELECT <include refid="wisImageResourceColumns" />,<include refid="publicColumns"/> FROM wis_image_resource a <include refid="wisImageResourceJoins"/> WHERE a.id = #{id}
+    </select>
+    
+    <!-- 根据主键集合获取持久层信息 -->
+	<select id="getByBatchId" parameterType="java.util.List" resultType="com.thinkgem.jeesite.modules.wisdom.entity.media.WisImageResource">
+       	select <include refid="wisImageResourceColumns" />,<include refid="publicColumns"/> from wis_image_resource a <include refid="wisImageResourceJoins"/>
+       	where a.del_flag = 0 and a.id in
+       	<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+      		#{item}
+		</foreach>
+	</select>
+    
+    <!-- 依据持久层获取分页信息   -->
+	<select id="findList" resultType="com.thinkgem.jeesite.modules.wisdom.entity.media.WisImageResource">
+		select <include refid="wisImageResourceColumns" />,<include refid="publicColumns"/> from wis_image_resource a <include refid="wisImageResourceJoins" />
+		<include refid="publicWhereSql"/> <include refid="publicSelect"/>
+	</select>
+	
+	<!-- 依据持久层获取分页总数   -->
+	<select id="getCountPage" resultType="int" parameterType="com.thinkgem.jeesite.modules.wisdom.entity.media.WisImageResource">
+		select count(*) from wis_image_resource a <include refid="wisImageResourceJoins" /> <include refid="publicWhereSql"/> 
+	</select>
+    
+    <!-- 获得全部信息   -->
+	<select id="getAllList" resultType="com.thinkgem.jeesite.modules.wisdom.entity.media.WisImageResource">
+		select <include refid="wisImageResourceColumns" />,<include refid="publicColumns"/> from wis_image_resource a <include refid="wisImageResourceJoins"/> where a.del_flag = 0
+	</select>
+    
+	<insert id="insert">
+		INSERT INTO wis_image_resource(
+			img_name,
+			img_url,
+			img_width,
+			img_height,
+			img_format,
+			type_id,
+			img_limit_width,
+			img_limit_height,
+			img_limit_format,
+			img_desc,
+			go_url,
+			create_org,
+			<include refid="insertColumns"/>
+		) VALUES (
+			#{imgName},
+			#{imgUrl},
+			#{imgWidth},
+			#{imgHeight},
+			#{imgFormat},
+			#{typeId},
+			#{imgLimitWidth},
+			#{imgLimitHeight},
+			#{imgLimitFormat},
+			#{imgDesc},
+			#{goUrl},
+			#{createOrg},
+			<include refid="insertValue"/>
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE wis_image_resource SET 	
+			img_name = #{imgName}
+			,img_url = #{imgUrl}
+			,img_width = #{imgWidth}
+			,img_height = #{imgHeight}
+			,img_format = #{imgFormat}
+			,type_id = #{typeId}
+			,img_limit_width = #{imgLimitWidth}
+			,img_limit_height = #{imgLimitHeight}
+			,img_limit_format = #{imgLimitFormat}
+			,img_desc = #{imgDesc}
+			,go_url = #{goUrl}
+			<include refid="updateColumns"/>
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

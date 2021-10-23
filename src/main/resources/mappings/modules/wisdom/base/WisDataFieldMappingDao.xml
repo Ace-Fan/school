@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.wisdom.dao.base.WisDataFieldMappingDao">
+    
+	<!-- 通用查询字段SQL -->
+	<sql id="publicColumns">
+		a.id as "id",
+		a.create_by as "createBy",
+		a.create_date as "createDate",
+		a.update_by as "updateBy",
+		a.update_date as "updateDate",
+		a.order_no as "orderNo",
+		a.del_flag as "delFlag"
+	</sql>
+    
+	<!-- 新增通用字段SQL -->
+	<sql id="insertColumns">
+		order_no, 
+		del_flag,
+		create_by,
+		create_date
+	</sql>
+    
+    <!-- 新增通用关联字段SQL -->
+	<sql id="insertValue">
+		#{orderNo},
+		0,
+		#{createBy},
+		#{createDate}
+	</sql>
+	
+	<!-- 修改通用字段SQL -->
+    <sql id="updateColumns">
+		,update_by = #{updateBy}
+		,update_date = #{updateDate}
+    </sql>
+    
+    <!-- 通用查询SQL -->
+    <sql id="publicWhereSql">
+    	<where>
+			a.del_flag = 0
+			<if test="dataTabId != null and dataTabId != '' ">
+				and a.data_tab_id = #{dataTabId}
+			</if>
+		</where>
+    </sql>
+    
+    <!-- 通用查询SQL -->
+	<sql id="publicSelect">
+		order by a.data_tab_id, a.id
+		<if test="page!=null and limit!=null">
+			limit #{page}, #{limit}
+		</if>
+	</sql>
+    
+	<sql id="wisDataFieldMappingColumns">
+		a.field_name AS "fieldName",
+		a.field_comment AS "fieldComment",
+		a.field_type AS "fieldType",
+		a.is_nullable AS "isNullable",
+		a.column_default AS "columnDefault",
+		a.is_import AS "isImport",
+		a.excel_column_name AS "excelColumnName",
+		a.excel_column_no AS "excelColumnNo",
+		a.data_tab_id AS "dataTabId",
+		b.table_name AS "dataTabName"
+	</sql>
+	
+	<sql id="wisDataFieldMappingJoins">
+		left join wis_data_import_tab b on a.data_tab_id = b.id
+	</sql>
+    
+	<select id="get" resultType="com.thinkgem.jeesite.modules.wisdom.entity.base.WisDataFieldMapping">
+		SELECT <include refid="wisDataFieldMappingColumns"/>,<include refid="publicColumns"/> FROM wis_data_field_mapping a <include refid="wisDataFieldMappingJoins"/> WHERE a.id = #{id} and a.del_flag = 0
+	</select>
+
+	<!-- 根据主键集合获取持久层信息 -->
+	<select id="getByBatchId" parameterType="java.util.List" resultType="com.thinkgem.jeesite.modules.wisdom.entity.base.WisDataFieldMapping">
+       	select <include refid="wisDataFieldMappingColumns" />,<include refid="publicColumns"/> from wis_data_field_mapping a <include refid="wisDataFieldMappingJoins"/>
+       	where a.del_flag = 0 and a.id in
+       	<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+      		#{item}
+		</foreach>
+	</select>
+	
+	<select id="findList" resultType="com.thinkgem.jeesite.modules.wisdom.entity.base.WisDataFieldMapping">
+		select <include refid="wisDataFieldMappingColumns" />,<include refid="publicColumns"/> from wis_data_field_mapping a <include refid="wisDataFieldMappingJoins" />
+		<include refid="publicWhereSql"/> <include refid="publicSelect"/>
+	</select>
+	
+	<select id="getCountPage" resultType="int" parameterType="com.thinkgem.jeesite.modules.wisdom.entity.base.WisDataFieldMapping">
+		select count(*) from wis_data_field_mapping a <include refid="wisDataFieldMappingJoins" /> <include refid="publicWhereSql"/> 
+	</select>
+	
+	<select id="getAllList" resultType="com.thinkgem.jeesite.modules.wisdom.entity.base.WisDataFieldMapping">
+		select <include refid="wisDataFieldMappingColumns" />,<include refid="publicColumns"/> from wis_data_field_mapping a <include refid="wisDataFieldMappingJoins"/> where a.del_flag = 0 order by a.order_no desc
+	</select>
+	
+	<!-- 获取EXCEL信息 -->
+	<select id="findExcelList" resultType="com.thinkgem.jeesite.modules.wisdom.entity.base.WisDataFieldMapping">
+		select <include refid="wisDataFieldMappingColumns" />,<include refid="publicColumns"/> from wis_data_field_mapping a <include refid="wisDataFieldMappingJoins"/>
+			where data_tab_id = (select id from wis_data_import_tab where table_code = #{tableName} and del_flag = 0) 
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO wis_data_field_mapping(
+			field_name,
+			field_comment,
+			field_type,
+			is_nullable,
+			column_default,
+			is_import,
+			excel_column_name,
+			excel_column_no,
+			data_tab_id,
+			<include refid="insertColumns"/>
+		) VALUES (
+			#{id},
+			#{fieldName},
+			#{fieldComment},
+			#{fieldType},
+			#{isNullable},
+			#{columnDefault},
+			#{isImport},
+			#{excelColumnName},
+			#{excelColumnNo},
+			#{dataTabId},
+			<include refid="insertValue"/>
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE wis_data_field_mapping SET 	
+			is_import = #{isImport}
+			<include refid="updateColumns"/>
+		WHERE id = #{id}
+	</update>
+	
+	<!-- 批量新增 -->
+	<insert id="excelSave" parameterType="java.util.List">
+		insert into wis_data_field_mapping(
+			field_name,
+			field_comment,
+			field_type,
+			is_nullable,
+			column_default,
+			is_import,
+			excel_column_name,
+			excel_column_no,
+			data_tab_id,
+			order_no, 
+			del_flag,
+			create_by,
+			create_date
+		) values 
+		<foreach collection="list" item="item" index="index" separator=",">
+			(
+				#{item.fieldName},
+				#{item.fieldComment},
+				#{item.fieldType},
+				#{item.isNullable},
+				#{item.columnDefault},
+				#{item.isImport},
+				
+				#{item.excelColumnName},
+				#{item.excelColumnNo},
+				#{item.dataTabId},
+				#{item.orderNo},
+				#{item.delFlag},
+				
+				#{item.createBy},
+				#{item.createDate}
+			)
+		</foreach>
+	</insert>
+	
+	<!-- 依据持久层获取分页总数   -->
+	<select id="countMapping" resultType="int" parameterType="com.thinkgem.jeesite.modules.wisdom.entity.base.WisDataFieldMapping">
+		select count(*) from wis_data_field_mapping a 
+		<where>
+			<if test="dataTabId != null and dataTabId != '' ">
+				a.data_tab_id = #{dataTabId}
+			</if>
+		</where>
+	</select>
+	
+</mapper>

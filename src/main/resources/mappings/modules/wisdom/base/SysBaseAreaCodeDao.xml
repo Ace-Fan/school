@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.wisdom.dao.base.SysBaseAreaCodeDao">
+    
+    <!-- 通用查询字段SQL -->
+	<sql id="publicColumns">
+		a.id as "id",
+		a.remark AS "remark",
+		a.is_enable as "isEnable",
+		a.create_by as "createBy",
+		a.create_date as "createDate",
+		a.update_by as "updateBy",
+		a.update_date as "updateDate",
+		a.order_no as "orderNo",
+		a.del_flag as "delFlag"
+	</sql>
+    
+	<!-- 新增通用字段SQL -->
+	<sql id="insertColumns">
+		remark,
+		is_enable,
+		order_no, 
+		del_flag,
+		create_by,
+		create_date
+	</sql>
+    
+    <!-- 新增通用关联字段SQL -->
+	<sql id="insertValue">
+		#{remark},
+		#{isEnable},
+		#{orderNo},
+		0,
+		#{createBy},
+		#{createDate}
+	</sql>
+	
+	<!-- 修改通用字段SQL -->
+    <sql id="updateColumns">
+    	,remark = #{remark}
+		,is_enable = #{isEnable}
+		,update_by = #{updateBy}
+		,update_date = #{updateDate}
+    </sql>
+    
+    <!-- 通用查询SQL -->
+    <sql id="publicWhereSql">
+    	<where>
+			a.del_flag = 0
+			<if test="code != null and code != '' ">
+				and a.code like concat('%', #{code}, '%')
+			</if>
+			<if test="name != null and name != ''">
+			 	and a.name like concat('%', #{name}, '%')
+			</if>
+			<if test="isEnable != null and isEnable != '' ">
+				and a.is_enable = #{isEnable}
+			</if>
+			<if test="statisticsCode != null and statisticsCode !='' ">
+        		and a.statistics_code like concat(#{statisticsCode},'%')
+        	</if>
+        	<if test="currLevel != null and currLevel !='' ">
+        		and a.curr_level = #{currLevel}
+        	</if>
+        	
+        	<!-- 19.11.20 新增 -->
+            <if test="county != null and county != ''">
+            	and curr_level = 3 and name = #{county}
+            </if>
+            <if test="city != null and city != ''">
+            	and code like concat(
+				(select 
+				SUBSTR((
+				select code from sys_base_area_code where curr_level = 2 and name = #{city}
+				)
+				,1,4))				
+				, '%')
+            </if>
+        	
+		</where>
+    </sql>
+    
+    <!-- 通用查询SQL -->
+	<sql id="publicSelect">
+		order by a.create_date desc
+		<if test="page!=null and limit!=null">
+			limit #{page}, #{limit}
+		</if>
+	</sql>
+    
+	<sql id="sysBaseAreaCodeColumns">
+		a.code AS "code",
+		a.name AS "name",
+		a.curr_level AS "currLevel",
+		a.statistics_code AS "statisticsCode",
+		
+		a.spell_full AS "spellFull",
+		a.spell_short AS "spellShort",
+		a.short_code AS "shortCode",
+		a.parent_code AS "parentCode"
+	</sql>
+	
+	<sql id="sysBaseAreaCodeJoins">
+	</sql>
+	
+	<!-- 根据ID获取值 -->
+    <select id="get" resultType="com.thinkgem.jeesite.modules.wisdom.entity.base.SysBaseAreaCode">
+        SELECT <include refid="sysBaseAreaCodeColumns"/>,<include refid="publicColumns"/> FROM sys_base_area_code a <include refid="sysBaseAreaCodeJoins"/> WHERE id = #{id}
+    </select>
+    
+    <!-- 分页查询数据 -->
+    <select id="areaList" resultType="com.thinkgem.jeesite.modules.wisdom.entity.base.SysBaseAreaCode">
+        SELECT <include refid="sysBaseAreaCodeColumns"/>,<include refid="publicColumns"/> FROM sys_base_area_code a <include refid="sysBaseAreaCodeJoins"/>
+        <where>
+        	a.del_flag = 0
+        	<if test="currLevel != null and currLevel !='' ">
+        		and a.curr_level = #{currLevel}
+        	</if>
+        </where>
+        ORDER BY a.code
+    </select>
+    
+    <!-- 根据主键集合获取持久层信息 -->
+	<select id="getByBatchId" parameterType="java.util.List" resultType="com.thinkgem.jeesite.modules.wisdom.entity.base.SysBaseAreaCode">
+       	select <include refid="sysBaseAreaCodeColumns" />,<include refid="publicColumns"/> from sys_base_area_code a <include refid="sysBaseAreaCodeJoins"/>
+       	where a.del_flag = 0 and a.id in
+       	<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+      		#{item}
+		</foreach>
+	</select>
+    
+    <!-- 依据持久层获取分页信息   -->
+	<select id="findList" resultType="com.thinkgem.jeesite.modules.wisdom.entity.base.SysBaseAreaCode">
+		select <include refid="sysBaseAreaCodeColumns" />,<include refid="publicColumns"/> from sys_base_area_code a <include refid="sysBaseAreaCodeJoins" />
+		<include refid="publicWhereSql"/> <include refid="publicSelect"/>
+	</select>
+	
+	<!-- 依据持久层获取分页总数   -->
+	<select id="getCountPage" resultType="int" parameterType="com.thinkgem.jeesite.modules.wisdom.entity.base.SysBaseAreaCode">
+		select count(*) from sys_base_area_code a <include refid="sysBaseAreaCodeJoins" /> <include refid="publicWhereSql"/> 
+	</select>
+    
+    <!-- 获得全部信息   -->
+	<select id="getAllList" resultType="com.thinkgem.jeesite.modules.wisdom.entity.base.SysBaseAreaCode">
+		select <include refid="sysBaseAreaCodeColumns" />,<include refid="publicColumns"/> from sys_base_area_code a <include refid="sysBaseAreaCodeJoins"/> 
+			where a.del_flag = 0 and a.is_enable = 1
+	</select>
+    
+	<insert id="insert">
+		INSERT INTO sys_base_area_code(
+			code,
+			name,
+			curr_level,
+			statistics_code,
+			spell_full,
+			spell_short,
+			short_code,
+			parent_code,
+			<include refid="insertColumns"/>
+		) VALUES (
+			#{code},
+			#{name},
+			#{currLevel},
+			#{statisticsCode},
+			#{spellFull},
+			#{spellShort},
+			#{shortCode},
+			#{parentCode},
+			<include refid="insertValue"/>
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE sys_base_area_code SET 	
+			code = #{code}
+			,name = #{name}
+			,curr_level = #{currLevel}
+			,statistics_code = #{statisticsCode}
+			,spell_full = #{spellFull}
+			,spell_short = #{spellShort}
+			,short_code = #{shortCode}
+			,parent_code = #{parentCode}
+			<include refid="updateColumns"/>
+		WHERE id = #{id}
+	</update>
+	
+	<!-- 默认获取一级行政区划信息 -->
+    <select id="getIndexAreaInfo" resultType="com.thinkgem.jeesite.modules.wisdom.entity.base.SysBaseAreaCode">
+    	select * from sys_base_area_code c where c.curr_level = 1
+    </select>
+    
+    <!-- 根据传递的统计编码和统计编码信息获取行政区划信息 -->
+    <select id="getAreaInfoByAreaCodeAndLev" resultType="com.thinkgem.jeesite.modules.wisdom.entity.base.SysBaseAreaCode">
+    	select * from sys_base_area_code c where c.curr_level = #{currLevel} and c.statistics_code like concat(#{areaCode},'%')
+    </select>
+    
+    <!-- 根据传递的统计编码和统计编码信息获取行政区划信息 -->
+    <select id="getAreaInfoByAreaNameAndLev" resultType="com.thinkgem.jeesite.modules.wisdom.entity.base.SysBaseAreaCode">
+    	select * from sys_base_area_code c where c.curr_level = #{currLevel} and c.name like concat(#{name},'%')
+    </select>
+	
+</mapper>

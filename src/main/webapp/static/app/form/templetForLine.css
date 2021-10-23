@@ -1,0 +1,51 @@
+/* 设置头部legend CSS样式 */
+.layui-field-title legend {
+	margin-left: 35%;
+}
+
+.layui-form-pane .layui-form-item {
+	margin: 0.5rem;
+}
+
+.layui-form-pane .layui-form-item .layui-col-xs3 .layui-inline {
+	width: 100%;
+}
+
+.layui-form-pane .layui-form-item .layui-col-xs6 .layui-form-label {
+	width: 20%;
+}
+
+.layui-form-pane .layui-form-item .layui-col-xs12 .layui-form-label {
+	width: 10%;
+}
+
+.layui-form-pane .layui-form-item .layui-col-xs12 .layui-input-inline {
+	width: 89%;
+}
+
+.layui-form-pane .layui-form-item .layui-col-xs6 .layui-input-inline {
+	width: 78%;
+}
+
+.layui-form-pane .layui-form-item .layui-col-xs3 .layui-form-label {
+	width: 40%;
+}
+
+.layui-form-pane .layui-form-item .layui-col-xs3 .layui-input-inline {
+	width: 56%;
+}
+
+.layui-form-pane .layui-form-item .layui-col-xs6 .layui-label-More {
+	padding-left: 0px;
+}
+
+.layui-form-pane .layui-form-item .layui-col-xs3 .layui-label-More {
+	padding-left: 0px;
+}
+
+.layui-main {
+	padding: 1rem; 
+	margin-left: 1rem; 
+	margin-top: -1rem; 
+	width: 94%;	
+}

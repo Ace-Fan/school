@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.wisdom.dao.agree.WisAgreementContentDao">
+    
+    <!-- 通用查询字段SQL -->
+	<sql id="publicColumns">
+		a.id AS "id",
+		a.remark as "remark",
+		a.is_enable as "isEnable",
+		a.create_by as "createBy",
+		a.create_date as "createDate",
+		a.update_by as "updateBy",
+		a.update_date as "updateDate",
+		a.order_no as "orderNo",
+		a.del_flag as "delFlag"
+	</sql>
+
+	<!-- 通用查询SQL -->
+	<sql id="publicWhereSql">
+		<where>
+			a.del_flag = 0
+			<if test="agreementTitle != null and agreementTitle != '' ">
+				and a.agreement_title like concat('%',#{agreementTitle},'%')
+			</if>
+			<if test="agreementVersion != null and agreementVersion != '' ">
+				and a.agreement_version like concat('%',#{agreementVersion},'%')
+			</if>
+			<if test="agreementId != null and agreementId != '' ">
+				and a.agreement_id = #{agreementId}
+			</if>
+			<if test="isEnable != null and isEnable != '' ">
+				and a.is_enable = #{isEnable}
+			</if>
+		</where>
+	</sql>
+
+	<!-- 通用查询SQL -->
+	<sql id="publicSelect">
+		order by a.create_date desc
+		<if test="page != null and limit != null">
+			limit #{page}, #{limit}
+		</if>
+	</sql>
+	
+	<!-- 新增通用字段SQL -->
+	<sql id="insertColumns">
+		remark,
+		is_enable,
+		order_no,
+		del_flag,
+		create_by,
+		create_date
+	</sql>
+
+	<!-- 新增通用关联字段SQL -->
+	<sql id="insertValue">
+		#{remark},
+		#{isEnable},
+		#{orderNo},
+		0,
+		#{createBy},
+		#{createDate}
+	</sql>
+
+	<!-- 修改通用字段SQL -->
+	<sql id="updateColumns">
+		,remark = #{remark}
+		,is_enable = #{isEnable}
+		,order_no = #{orderNo}
+		,update_by = #{updateBy}
+		,update_date = #{updateDate}
+	</sql>
+    
+	<sql id="wisAgreementContentColumns">
+		a.agreement_title AS "agreementTitle",
+		a.agreement_version AS "agreementVersion",
+		a.agreement_content AS "agreementContent",
+		a.agreement_id AS "agreementId",
+		b.agreement_type as "agreementName"
+	</sql>
+	
+	<sql id="wisAgreementContentJoins">
+		left join wis_agreement_type b on a.agreement_id = b.id
+	</sql>
+    
+    <!-- 根据ID获取值 -->
+    <select id="get" resultType="com.thinkgem.jeesite.modules.wisdom.entity.agree.WisAgreementContent">
+        SELECT <include refid="wisAgreementContentColumns" />,<include refid="publicColumns"/> FROM wis_agreement_content a <include refid="wisAgreementContentJoins"/> WHERE a.id = #{id}
+    </select>
+    
+    <!-- 根据主键集合获取持久层信息 -->
+	<select id="getByBatchId" parameterType="java.util.List" resultType="com.thinkgem.jeesite.modules.wisdom.entity.agree.WisAgreementContent">
+       	select <include refid="wisAgreementContentColumns" />,<include refid="publicColumns"/> from wis_agreement_content a <include refid="wisAgreementContentJoins"/>
+       	where a.del_flag = 0 and a.id in
+       	<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+      		#{item}
+		</foreach>
+	</select>
+    
+    <!-- 依据持久层获取分页信息   -->
+	<select id="findList" resultType="com.thinkgem.jeesite.modules.wisdom.entity.agree.WisAgreementContent">
+		select <include refid="wisAgreementContentColumns" />,<include refid="publicColumns"/> from wis_agreement_content a <include refid="wisAgreementContentJoins" />
+		<include refid="publicWhereSql"/> <include refid="publicSelect"/>
+	</select>
+	
+	<!-- 依据持久层获取分页总数   -->
+	<select id="getCountPage" resultType="int" parameterType="com.thinkgem.jeesite.modules.wisdom.entity.agree.WisAgreementContent">
+		select count(*) from wis_agreement_content a <include refid="wisAgreementContentJoins" /> <include refid="publicWhereSql"/> 
+	</select>
+    
+    <!-- 获得全部信息   -->
+	<select id="getAllList" resultType="com.thinkgem.jeesite.modules.wisdom.entity.agree.WisAgreementContent">
+		select <include refid="wisAgreementContentColumns" />,<include refid="publicColumns"/> from wis_agreement_content a <include refid="wisAgreementContentJoins"/> where a.del_flag = 0
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO wis_agreement_content(
+			agreement_title,
+			agreement_version,
+			agreement_content,
+			agreement_id,
+			<include refid="insertColumns"/>
+		) VALUES (
+			#{agreementTitle},
+			#{agreementVersion},
+			#{agreementContent},
+			#{agreementId},
+			<include refid="insertValue"/>
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE wis_agreement_content SET 	
+			agreement_title = #{agreementTitle}
+			,agreement_version = #{agreementVersion}
+			,agreement_content = #{agreementContent}
+			,agreement_id = #{agreementId}
+			<include refid="updateColumns"/>
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

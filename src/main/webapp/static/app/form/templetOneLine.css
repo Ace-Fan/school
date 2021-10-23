@@ -1,0 +1,28 @@
+/* 设置头部legend CSS样式 */
+.layui-field-title legend {
+	margin-left: 35%;
+}
+
+/* 设置单文本框 文本框的宽度 */
+.layui-form-pane #dis .layui-form-item .layui-col-xs11 .layui-input-inline {
+	width: 55rem;
+}
+
+.layui-form-pane #dis .layui-form-item .layui-col-xs11 .layui-form-label {
+	width: 12%;
+}
+
+.layui-form-pane #dis .layui-form-item .layui-col-xs12 .layui-input-inline {
+	width: 78%;
+}
+
+.layui-form-item .layui-col-xs12 .layui-form-label {
+	width: 15%;
+}
+
+.layui-main {
+	padding: 1rem; 
+	margin-left: 1rem; 
+	margin-top: -1rem; 
+	width: 80%;	
+}

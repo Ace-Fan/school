@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.wisdom.dao.base.SysBaseDictDao">
+    
+    <!-- 通用查询字段SQL -->
+	<sql id="publicColumns">
+		a.id AS "id",
+		a.remark as "remark",
+		a.is_enable as "isEnable",
+		a.create_by as "createBy",
+		a.create_date as "createDate",
+		a.update_by as "updateBy",
+		a.update_date as "updateDate",
+		a.order_no as "orderNo",
+		a.del_flag as "delFlag"
+	</sql>
+
+	<!-- 通用查询SQL -->
+	<sql id="publicWhereSql">
+		<where>
+			a.del_flag = 0
+			<if test="code != null and code != '' ">
+				and a.code like concat('%',#{code},'%')
+			</if>
+			<if test="name != null and name != '' ">
+				and a.name like concat('%',#{name},'%')
+			</if>
+			<if test="typeName != null and typeName != '' ">
+				and a.type_name = #{typeName}
+			</if>
+			<if test="type != null and type != '' ">
+				and a.type = #{type}
+			</if>
+			<if test="isEnable != null and isEnable != '' ">
+				and a.is_enable = #{isEnable}
+			</if>
+		</where>
+	</sql>
+
+	<!-- 通用查询SQL -->
+	<sql id="publicSelect">
+		order by a.type desc
+		<if test="page != null and limit != null">
+			limit #{page}, #{limit}
+		</if>
+	</sql>
+	
+	<!-- 新增通用字段SQL -->
+	<sql id="insertColumns">
+		remark,
+		is_enable,
+		order_no,
+		del_flag,
+		create_by,
+		create_date
+	</sql>
+
+	<!-- 新增通用关联字段SQL -->
+	<sql id="insertValue">
+		#{remark},
+		#{isEnable},
+		#{orderNo},
+		0,
+		#{createBy},
+		#{createDate}
+	</sql>
+
+	<!-- 修改通用字段SQL -->
+	<sql id="updateColumns">
+		,remark = #{remark}
+		,is_enable = #{isEnable}
+		,order_no = #{orderNo}
+		,update_by = #{updateBy}
+		,update_date = #{updateDate}
+	</sql>
+    
+	<sql id="sysBaseDictColumns">
+		a.code AS "code",
+		a.name AS "name",
+		a.type AS "type",
+		a.type_name AS "typeName",
+		a.parent_id AS "parentId",
+		a.start_section AS "startSection",
+		a.end_section AS "endSection",
+		a.parent_temp_id AS "parentTempId",
+		b.name AS "parentTempName"
+	</sql>
+	
+	<sql id="sysBaseDictJoins">
+		left join sys_base_dict b on b.id = a.parent_temp_id
+	</sql>
+	
+	<!-- 根据ID获取值 -->
+    <select id="get" resultType="com.thinkgem.jeesite.modules.wisdom.entity.base.SysBaseDict">
+        SELECT <include refid="sysBaseDictColumns" />,<include refid="publicColumns"/> FROM sys_base_dict a <include refid="sysBaseDictJoins"/> WHERE a.id = #{id}
+    </select>
+    
+    <!-- 根据主键集合获取持久层信息 -->
+	<select id="getByBatchId" parameterType="java.util.List" resultType="com.thinkgem.jeesite.modules.wisdom.entity.base.SysBaseDict">
+       	select <include refid="sysBaseDictColumns" />,<include refid="publicColumns"/> from sys_base_dict a <include refid="sysBaseDictJoins"/>
+       	where a.del_flag = 0 and a.id in
+       	<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+      		#{item}
+		</foreach>
+	</select>
+    
+    <!-- 依据持久层获取分页信息   -->
+	<select id="findList" resultType="com.thinkgem.jeesite.modules.wisdom.entity.base.SysBaseDict">
+		select <include refid="sysBaseDictColumns" />,<include refid="publicColumns"/> from sys_base_dict a <include refid="sysBaseDictJoins" />
+		<include refid="publicWhereSql"/> <include refid="publicSelect"/>
+	</select>
+	
+	<!-- 依据持久层获取分页总数   -->
+	<select id="getCountPage" resultType="int" parameterType="com.thinkgem.jeesite.modules.wisdom.entity.base.SysBaseDict">
+		select count(*) from sys_base_dict a <include refid="sysBaseDictJoins" /> <include refid="publicWhereSql"/> 
+	</select>
+    
+    <!-- 获得全部信息   -->
+	<select id="getAllList" resultType="com.thinkgem.jeesite.modules.wisdom.entity.base.SysBaseDict">
+		select <include refid="sysBaseDictColumns" />,<include refid="publicColumns"/> from sys_base_dict a <include refid="sysBaseDictJoins"/> where a.del_flag = 0
+	</select>
+    
+    <!-- 获取树形结构信息 -->
+    <select id="findListMap" parameterType="String" resultType="Map">
+		SELECT
+			d.id AS id,
+			d.`type_name` AS `title`,
+			d.parent_id AS parentId
+		FROM
+			sys_base_dict AS d
+		WHERE
+			del_flag = 0 
+			AND d.parent_id = #{parentId} 
+			<if test="name!=null and name.length()>0">
+				AND name=#{name}	
+			</if>
+		GROUP BY type_name ORDER BY type
+	</select> 
+    
+	<insert id="insert">
+		INSERT INTO sys_base_dict(
+			code,
+			name,
+			type,
+			type_name,
+			parent_id,
+			start_section,
+			end_section,
+			parent_temp_id,
+			<include refid="insertColumns"/>
+		) VALUES (
+			#{code},
+			#{name},
+			#{type},
+			#{typeName},
+			#{parentId},
+			#{startSection},
+			#{endSection},
+			#{parentTempId},
+			<include refid="insertValue"/>
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE sys_base_dict SET 	
+			code = #{code}
+			,name = #{name}
+			,type = #{type}
+			,type_name = #{typeName}
+			,parent_id = #{parentId}
+			,start_section = #{startSection}
+			,end_section = #{endSection}
+			,parent_temp_id = #{parentTempId}
+			<include refid="updateColumns"/>
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

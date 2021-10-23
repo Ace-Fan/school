@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.wisdom.dao.base.WisReceiveAddressDao">
+    
+	<sql id="wisReceiveAddressColumns">
+		a.id AS "id",
+		a.user_id AS "userId",
+		a.name AS "name",
+		a.phone AS "phone",
+		a.city AS "city",
+		a.is_default AS "isDefault",
+		a.detail AS "detail",
+		a.city_code AS "cityCode",
+		a.create_time AS "createTime",
+		a.update_time AS "updateTime",
+		a.postcode AS "postcode"
+	</sql>
+	
+	<sql id="wisReceiveAddressJoins">
+	</sql>
+    
+	<!-- 根据ID获取值 -->
+    <select id="get" resultType="com.thinkgem.jeesite.modules.wisdom.entity.base.WisReceiveAddress">
+        SELECT <include refid="wisReceiveAddressColumns" /> FROM wis_receive_address a <include refid="wisReceiveAddressJoins"/> WHERE a.id = #{id}
+    </select>
+    
+    <!-- 依据持久层获取分页信息   -->
+	<select id="findList" resultType="com.thinkgem.jeesite.modules.wisdom.entity.base.WisReceiveAddress">
+		select <include refid="wisReceiveAddressColumns" /> from wis_receive_address a <include refid="wisReceiveAddressJoins" />
+		where 1=1
+		<if test="name != null and name != '' ">
+			and a.name like concat('%',#{name},'%')
+		</if>
+		<if test="page!=null and limit!=null">
+			LIMIT #{page}, #{limit}
+		</if>
+	</select>
+	
+	<!-- 依据持久层获取分页总数   -->
+	<select id="getCountPage" resultType="int" parameterType="com.thinkgem.jeesite.modules.wisdom.entity.base.WisReceiveAddress">
+		select count(*) from wis_receive_address a <include refid="wisReceiveAddressJoins" />
+		where 1=1
+		<if test="name != null and name != '' ">
+			and a.name like concat('%',#{name},'%')
+		</if>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO wis_receive_address(
+			user_id,
+			name,
+			phone,
+			city,
+			is_default,
+			detail,
+			city_code,
+			create_time,
+			postcode
+		) VALUES (
+			#{userId},
+			#{name},
+			#{phone},
+			#{city},
+			#{isDefault},
+			#{detail},
+			#{cityCode},
+			#{createTime},
+			#{postcode}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE wis_receive_address SET 	
+			user_id = #{userId},
+			name = #{name},
+			phone = #{phone},
+			city = #{city},
+			is_default = #{isDefault},
+			detail = #{detail},
+			city_code = #{cityCode},
+			update_time = #{updateTime},
+			postcode = #{postcode}
+		WHERE id = #{id}
+	</update>
+	
+	<delete id="delete">
+		DELETE FROM wis_receive_address WHERE id = #{id}
+	</delete>
+	
+	<!-- 切换指定表指定主键指定字段的值 -->
+	<update id="toggleTableColumns">
+		update ${tableName} set ${colunms} = #{value}, update_time = #{uDate} where id = #{id}
+	</update>
+	
+</mapper>

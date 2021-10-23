@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.wisdom.dao.base.SysBaseRegionCodeDao">
+    
+	<sql id="sysBaseRegionCodeColumns">
+		a.id AS "id",
+		a.city_code AS "cityCode",
+		a.parent_code AS "parentCode",
+		a.name AS "name",
+		a.merger_name AS "mergerName",
+		a.short_name AS "shortName",
+		a.merger_short_name AS "mergerShortName",
+		a.level AS "level",
+		a.level_type AS "levelType",
+		a.telephone_code AS "telephoneCode",
+		a.zip_code AS "zipCode",
+		a.name_pinyin AS "namePinyin",
+		a.name_jianpin AS "nameJianpin",
+		a.center AS "center",
+		a.name_first_char AS "nameFirstChar",
+		a.longitude AS "longitude",
+		a.latitude AS "latitude",
+		a.status AS "status",
+		a.version AS "version",
+		a.create_time AS "createTime",
+		a.update_time AS "updateTime"
+	</sql>
+	
+	<sql id="sysBaseRegionCodeJoins">
+	</sql>
+    
+    <!-- 根据主键查询 -->
+	<select id="get" resultType="com.thinkgem.jeesite.modules.wisdom.entity.base.SysBaseRegionCode">
+		SELECT <include refid="sysBaseRegionCodeColumns"/> FROM sys_base_region_code a <include refid="sysBaseRegionCodeJoins"/> WHERE a.id = #{id}
+	</select>
+	
+	<!-- 依据持久层获取分页信息   -->
+	<select id="findList" resultType="com.thinkgem.jeesite.modules.wisdom.entity.base.SysBaseRegionCode">
+		select <include refid="sysBaseRegionCodeColumns" /> from sys_base_region_code a <include refid="sysBaseRegionCodeJoins" />
+		where 1=1
+		<if test="cityCode != null and cityCode != '' ">
+			and a.city_code like concat('%',#{cityCode},'%')
+		</if>
+		<if test="name != null and name != '' ">
+			and a.name like concat('%',#{name},'%')
+		</if>
+		<if test="shortName != null and shortName != '' ">
+			and a.short_name like concat('%',#{shortName},'%')
+		</if>
+		<if test="page!=null and limit!=null">
+			LIMIT #{page}, #{limit}
+		</if>
+	</select>
+	
+	<!-- 依据持久层获取分页总数   -->
+	<select id="getCountPage" resultType="int" parameterType="com.thinkgem.jeesite.modules.wisdom.entity.base.SysBaseRegionCode">
+		select count(*) from sys_base_region_code a <include refid="sysBaseRegionCodeJoins" />
+		where 1=1
+		<if test="cityCode != null and cityCode != '' ">
+			and a.city_code like concat('%',#{cityCode},'%')
+		</if>
+		<if test="name != null and name != '' ">
+			and a.name like concat('%',#{name},'%')
+		</if>
+		<if test="shortName != null and shortName != '' ">
+			and a.short_name like concat('%',#{shortName},'%')
+		</if>
+		
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO sys_base_region_code(
+			city_code,
+			parent_code,
+			name,
+			merger_name,
+			short_name,
+			merger_short_name,
+			level,
+			level_type,
+			telephone_code,
+			zip_code,
+			name_pinyin,
+			name_jianpin,
+			center,
+			name_first_char,
+			longitude,
+			latitude,
+			status,
+			version,
+			create_time
+		) VALUES (
+			#{cityCode},
+			#{parentCode},
+			#{name},
+			#{mergerName},
+			#{shortName},
+			#{mergerShortName},
+			#{level},
+			#{levelType},
+			#{telephoneCode},
+			#{zipCode},
+			#{namePinyin},
+			#{nameJianpin},
+			#{center},
+			#{nameFirstChar},
+			#{longitude},
+			#{latitude},
+			#{status},
+			#{version},
+			#{createTime}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE sys_base_region_code SET 	
+			city_code = #{cityCode},
+			parent_code = #{parentCode},
+			name = #{name},
+			merger_name = #{mergerName},
+			short_name = #{shortName},
+			merger_short_name = #{mergerShortName},
+			level = #{level},
+			level_type = #{levelType},
+			telephone_code = #{telephoneCode},
+			zip_code = #{zipCode},
+			name_pinyin = #{namePinyin},
+			name_jianpin = #{nameJianpin},
+			center = #{center},
+			name_first_char = #{nameFirstChar},
+			longitude = #{longitude},
+			latitude = #{latitude},
+			status = #{status},
+			version = #{version},
+			update_time = #{updateTime}
+		WHERE id = #{id}
+	</update>
+	
+	<delete id="delete">
+		DELETE FROM sys_base_region_code WHERE id = #{id}
+	</delete>
+	
+</mapper>
